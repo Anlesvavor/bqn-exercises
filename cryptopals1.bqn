@@ -40,3 +40,16 @@ a ← "1c0111001f010100061a024b53535009181c"
 b ← "686974207468652062756c6c277320657965"
 •Show a FixedXOR b
 !("746865206b696420646f6e277420706c6179" ≡ a FixedXOR b)
+
+#WIP
+ex3 ← {
+  #x ← (6 (⌊∘÷˜⟜(↕≠)⊔⊢) (HexToBitstring base64Dict))
+  •Show b ← ((¯8↑⊢)(2 ToBase˜ ⊢))¨ ↕(2⋆8)
+  •Show a ← <∘∾˘(∘‿2 ⥊ (4 Chunk ⊢)(HexToBitstring mysteryText))
+  #(base64Dict ⊑˜ ToDec)¨ ((4 Chunk ⊢)∘∾˘(b ≠⌜ a))
+  table ← (b ≠⌜ a)
+  #dec ← (ToDec)¨ ((4 Chunk ⊢)∘∾˘(b ≠⌜ a))
+  tableOfBits ← (6 Chunk ⊢)∘∾˘table
+  tableOfDecs ← ToDec¨ tableOfBits
+  (base64Dict ⊑˜ ⊢)¨ tableOfDecs
+}
