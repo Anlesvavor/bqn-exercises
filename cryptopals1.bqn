@@ -20,7 +20,7 @@ HexToBitstring ← {
   temp1 ← numbersMask × ⟜ (((ToASCII '0') -˜ ⊢)) (ToASCII 𝕩)
   temp2 ← lettersMask × ⟜ (10+⊢)(((ToASCII 'a') -˜ ⊢)) (ToASCII 𝕩)
   bitstringTemp ← {(𝕩 ToBase 2)}¨ (temp1 + temp2)
-  bitString ← ∾´{4↑𝕩}¨ bitstringTemp
+  bitString ← ∾´{¯4↑𝕩}¨ bitstringTemp
   bitString
 }
 HexToBase64 ← {
@@ -41,15 +41,19 @@ b ← "686974207468652062756c6c277320657965"
 •Show a FixedXOR b
 !("746865206b696420646f6e277420706c6179" ≡ a FixedXOR b)
 
-#WIP
+PlainTextScore ← {
+  m ← ("etaon rishdlfcmugypwbvkjxzq'ETAONRISHDLFCMUGYPWBVKJXZQ") ⊐
+  +´ m
+}
+
 ex3 ← {
-  #x ← (6 (⌊∘÷˜⟜(↕≠)⊔⊢) (HexToBitstring base64Dict))
-  •Show b ← ((¯8↑⊢)(2 ToBase˜ ⊢))¨ ↕(2⋆8)
-  •Show a ← <∘∾˘(∘‿2 ⥊ (4 Chunk ⊢)(HexToBitstring mysteryText))
-  #(base64Dict ⊑˜ ToDec)¨ ((4 Chunk ⊢)∘∾˘(b ≠⌜ a))
-  table ← (b ≠⌜ a)
-  #dec ← (ToDec)¨ ((4 Chunk ⊢)∘∾˘(b ≠⌜ a))
-  tableOfBits ← (6 Chunk ⊢)∘∾˘table
-  tableOfDecs ← ToDec¨ tableOfBits
-  (base64Dict ⊑˜ ⊢)¨ tableOfDecs
+  mysteryText ← "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+  testBytes ← ((¯8↑⊢)(2 ToBase˜ ⊢))¨ ↕(2⋆8)
+  mysteryBytes ← <∘∾˘(∘‿2 ⥊ (4 Chunk ⊢)(HexToBitstring mysteryText))
+  table ← (testBytes ≠⌜ mysteryBytes)
+  tableOfBits ← (8 Chunk ⊢)∘∾˘table
+  tableOfStrings ← @+ToDec¨ tableOfBits
+  strings ← ⥊<˘tableOfStrings
+  #If only this language had a sortByFunction...
+  ({⊑(𝕩⊐(⌊´𝕩))} PlainTextScore¨strings) ⊑∘⊏ strings
 }
