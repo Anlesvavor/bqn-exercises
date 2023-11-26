@@ -1,6 +1,7 @@
 #"Constants"
 hexDict ← (('0'+↕10) ∾ ('a'+↕6))
 base64Dict ← (('A'+↕26) ∾ ('a'+↕26) ∾ ('0'+↕10) ∾ "+/")
+englishDict ← (('A'+↕26) ∾ ('a'+↕26) ∾ ('0'+↕10) ∾" '")
 
 #Functions
 ToASCII ← (-@-⊢)¨
@@ -29,31 +30,57 @@ HexToBase64 ← {
 FixedXOR ← (hexDict⊑˜⊢)¨∘(4 BitsToDec⊢)∘≠○HexToBitString
 HexToString ← {(@+ToDec)˘(∘‿8⥊HexToBitstring 𝕩)}
 
-#Ex1
-h ← "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"
-•Show HexToBase64 h
-!("SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t" ≡ HexToBase64 h)
-!("I'm killing your brain like a poisonous mushroom" ≡ HexToString h)
-
-#Ex2
-a ← "1c0111001f010100061a024b53535009181c"
-b ← "686974207468652062756c6c277320657965"
-•Show a FixedXOR b
-!("746865206b696420646f6e277420706c6179" ≡ a FixedXOR b)
-
-PlainTextScore ← {
-  m ← ("etaon rishdlfcmugypwbvkjxzq'ETAONRISHDLFCMUGYPWBVKJXZQ") ⊐
-  +´ m
+ex1 ← {
+  h ← "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"
+  •Show HexToBase64 h
+  !("SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t" ≡ HexToBase64 h)
+  !("I'm killing your brain like a poisonous mushroom" ≡ HexToString h)
 }
 
-ex3 ← {
-  mysteryText ← "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+ex2 ← {
+  a ← "1c0111001f010100061a024b53535009181c"
+  b ← "686974207468652062756c6c277320657965"
+  •Show a FixedXOR b
+  !("746865206b696420646f6e277420706c6179" ≡ a FixedXOR b)
+  PlainTextScore ← {
+    m ← ("etaon rishdlfcmugypwbvkjxzq'ETAONRISHDLFCMUGYPWBVKJXZQ") ⊐ 𝕩
+    +´ m
+  }
+}
+
+SingleByteXOR ← {
+  mysteryText ← 𝕩
   testBytes ← ((¯8↑⊢)(2 ToBase˜ ⊢))¨ ↕(2⋆8)
   mysteryBytes ← <∘∾˘(∘‿2 ⥊ (4 Chunk ⊢)(HexToBitstring mysteryText))
   table ← (testBytes ≠⌜ mysteryBytes)
   tableOfBits ← (8 Chunk ⊢)∘∾˘table
   tableOfStrings ← @+ToDec¨ tableOfBits
-  strings ← ⥊<˘tableOfStrings
-  #If only this language had a sortByFunction...
-  ({⊑(𝕩⊐(⌊´𝕩))} PlainTextScore¨strings) ⊑∘⊏ strings
+  ⊢ strings ← ⥊<˘tableOfStrings
+}
+
+PlainTextScore ← {
+  m ← ("etaon rishdlfcmugypwbvkjxzq'ETAONRISHDLFCMUGYPWBVKJXZQ") ⊐ 𝕩
+  +´ m
+}
+
+ex3 ← {
+  mysteryText ← "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+  strings ← SingleByteXOR mysteryText
+  scores ← PlainTextScore¨ strings
+  bestsIndex ← ⊑⊐⟜(⌊´) scores
+  •Show bestsIndex ⊑∘⊏ strings
+}
+
+ex4 ← {
+  lines ← •file.Lines "4.txt"
+  F ← {
+    strings ← SingleByteXOR 𝕩
+    scores ← PlainTextScore¨ strings
+    bestsIndex ← ⊑⊐⟜(⌊´) scores
+    bestsIndex ⊑∘⊏ strings
+  }
+  results ← F¨ lines
+  scores ← PlainTextScore¨ results
+  bestsIndex ← ⊑⊐⟜(⌊´) scores
+  •Show bestsIndex ⊑∘⊏ results
 }
